@@ -24,6 +24,7 @@ export default function ChatWidget() {
         }
     }, [messages]);
 
+        // === GANTI SELURUH FUNGSI INI ===
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!userInput.trim()) return;
@@ -35,28 +36,34 @@ export default function ChatWidget() {
         setUserInput('');
 
         try {
-            // PENTING: Ganti URL ini dengan URL Cloud Run Anda saat deployment
             const response = await fetch('http://127.0.0.1:5000/api/ask', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ question: userMessage.text })
             });
+            
+            // Membaca respons dari backend
+            const data = await response.json();
 
+            // Jika respons TIDAK sukses (misalnya error 500 dari Flask)
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                // Tampilkan pesan error dari backend jika ada, atau pesan default
+                const errorMessageText = data.error || 'Terjadi kesalahan pada server.';
+                throw new Error(errorMessageText);
             }
 
-            const data = await response.json();
-            const botMessage: Message = { text: data.answer || 'Maaf, terjadi kesalahan.', type: 'bot' };
+            // Jika respons sukses
+            const botMessage: Message = { text: data.answer || 'Maaf, saya tidak mendapat jawaban.', type: 'bot' };
+            setMessages(prev => [...prev.slice(0, -1), botMessage]);
 
-            setMessages(prev => [...prev.slice(0, -1), botMessage]); // Ganti pesan loading dengan jawaban AI
         } catch (error) {
             console.error("Error fetching AI response:", error);
-            const errorMessage: Message = { text: 'Tidak bisa terhubung ke server.', type: 'bot' };
+            // Menampilkan pesan error yang lebih informatif di chat
+            const errorMessageText = error instanceof Error ? error.message : 'Tidak bisa terhubung ke server.';
+            const errorMessage: Message = { text: `Error: ${errorMessageText}`, type: 'bot' };
             setMessages(prev => [...prev.slice(0, -1), errorMessage]);
         }
     };
-
     return (
         <>
             <div className={`chat-popup ${isOpen ? 'active' : ''}`} id="chat-popup">
