@@ -3,7 +3,8 @@ import WorkoutBrowser from '@/components/WorkoutBrowser'; // Impor komponen baru
 // Fungsi untuk mengambil data dari backend Flask
 async function getWorkouts() {
     try {
-        const res = await fetch('http://127.0.0.1:5000/api/workouts', { cache: 'no-store' });
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://127.0.0.1:5000';
+        const res = await fetch(`${apiUrl}/api/workouts`, { cache: 'no-store' });
         if (!res.ok) return { workouts: [], filters: { body_parts: [], levels: [] } };
         return res.json();
     } catch (error) {
