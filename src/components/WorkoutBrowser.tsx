@@ -1,9 +1,11 @@
-'use client'; // Ini adalah Client Component yang interaktif
+'use client'; // Menandakan ini adalah Client Component
 
 import { useState, useMemo } from 'react';
+import Link from 'next/link';
 
 // Mendefinisikan tipe data untuk kejelasan
 type Workout = {
+    'Unnamed: 0': number;
     Title: string;
     BodyPart: string;
     Level: string;
@@ -55,14 +57,16 @@ export default function WorkoutBrowser({ initialWorkouts, filters }: Props) {
             <div className="workout-grid">
                 {filteredWorkouts.length > 0 ? (
                     filteredWorkouts.map((workout, index) => (
-                        <div key={index} className="workout-card">
-                            <h3>{workout.Title}</h3>
-                            <div className="card-icons">
-                                <span className="icon-tag"><i className="fas fa-dumbbell"></i> {workout.BodyPart}</span>
-                                <span className="icon-tag"><i className="fas fa-tachometer-alt"></i> {workout.Level}</span>
+                        <Link key={index} href={`/workouts/${workout['Unnamed: 0']}`} className="workout-card-link">
+                            <div className="workout-card">
+                                <h3>{workout.Title}</h3>
+                                <div className="card-icons">
+                                    <span className="icon-tag"><i className="fas fa-dumbbell"></i> {workout.BodyPart}</span>
+                                    <span className="icon-tag"><i className="fas fa-tachometer-alt"></i> {workout.Level}</span>
+                                </div>
+                                <p><strong>Equipment:</strong> {workout.Equipment}</p>
                             </div>
-                            <p><strong>Equipment:</strong> {workout.Equipment}</p>
-                        </div>
+                        </Link>
                     ))
                 ) : (
                     <p>Tidak ada latihan yang cocok dengan filter Anda.</p>
